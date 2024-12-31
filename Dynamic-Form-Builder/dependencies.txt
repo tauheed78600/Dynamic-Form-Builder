@@ -1,0 +1,6 @@
+npm uninstall react react-dom
+npm install react@18 react-dom@18
+npm install web-vitals
+npm install @tsed/react-formio react-table --save
+npm install formiojs choices.js --save
+npm install bootstrap

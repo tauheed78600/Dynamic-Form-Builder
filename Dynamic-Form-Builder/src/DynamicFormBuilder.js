@@ -31,9 +31,9 @@ export default function DynamicFormBuilder() {
     }
   }
   return (
-    <div className="form-builder-wrapper">
+    <div className="form-builder-wrapper p-4">
       <div className="center">
-        <h2>FORM BUILDER</h2>
+        <h2 className="text-blue-700 text-3xl font-extrabold">FORM BUILDER</h2>
       </div>
       <div className="dynamic-form-builder">
         <FormBuilder

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 import { createToken } from "../utils/TokenManager.js";
+import Client from "../models/Clients.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const COOKIE_NAME = "AuthToken";
@@ -11,6 +12,16 @@ const COOKIE_NAME = "AuthToken";
 
 export const getAllUsers = async (req, res, next) => {
     try {
+        const user = await User.findOne();
+        if (!user) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        const client = new Client({ clientName: "Client B", user_id: user._id });
+        await client.save();
+
+        console.log("Client saved successfully");
+
         const users = await User.find();
         return res.status(200).json(users);
     } catch (error) {
@@ -18,38 +29,38 @@ export const getAllUsers = async (req, res, next) => {
     }
 };
 
-export const googleSignin = async(req, res, next) =>{
+export const googleSignin = async (req, res, next) => {
     const { token } = req.body;
 
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
 
-    const { email, name, picture, sub: googleId } = payload;
+        const { email, name, picture, sub: googleId } = payload;
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ email, name, avatar: picture, googleId });
-      await user.save();
+        let user = await User.findOne({ email });
+        if (!user) {
+            user = new User({ email, name, avatar: picture, googleId });
+            await user.save();
+        }
+
+        const jwtToken = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        res.status(200).json({ token: jwtToken, user });
+    } catch (error) {
+        res.status(400).json({ message: "Invalid Google Token" });
     }
-
-    const jwtToken = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.status(200).json({ token: jwtToken, user });
-  } catch (error) {
-    res.status(400).json({ message: "Invalid Google Token" });
-  }
 }
 
 export const signin = async (req, res, next) => {
     try {
         const { form } = req.body;
-
+        console.log("form in line 52", form)
         const email = form.email;
         const password = form.password;
 
@@ -57,7 +68,7 @@ export const signin = async (req, res, next) => {
         if (!checkUser) {
             return res.status(401).send("User not registered");
         }
-
+        console.log("checkUser line 60", checkUser)
         const checkPassword = await bcrypt.compare(password, checkUser.password);
 
         if (!checkPassword) {
@@ -74,6 +85,7 @@ export const signin = async (req, res, next) => {
             token: token
         });
     } catch (error) {
+        console.log("error", error)
         return res.status(500).json({ message: "ERROR", cause: error.message });
     }
 };

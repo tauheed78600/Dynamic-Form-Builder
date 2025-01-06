@@ -41,13 +41,13 @@ const FormPage = () => {
     const addForm = async () => {
       try {
         const res = await addForm(params.id, formName)
-        console.log('Response of addClient:', res.data);
+        console.log('Response of addClient:', res);
         if (res.status === 200) {
           setForms(prevForms => [...prevForms, { formName }]);
           showAddForm(false)
         }
       } catch (error) {
-        console.error('Error in addClient:', error);
+        console.error('Error in addForm:', error);
       }
     }
     addForm()

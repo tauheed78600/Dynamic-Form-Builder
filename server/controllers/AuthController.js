@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 import { createToken } from "../utils/TokenManager.js";
 import Client from "../models/Clients.js";
+import Form from "../models/Forms.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -23,11 +24,32 @@ export const fetchClients = async (req, res, next) => {
 }
 
 export const getForms = async (req, res, next) => {
-    
+    try {
+        const { id } = req.params;
+        console.log("req id", id);
+
+        const forms = await Form.find({ user_id: id });
+        console.log("fetched forms", forms)
+        return res.status(200).json(forms);
+    } catch (error) {
+        console.error("Error fetching clients:", error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 }
 
 export const addForms = async (req, res, next) => {
-    
+    try {
+        console.log("inside add forms")
+        const { id } = req.params
+        const { formName } = req.body
+        console.log("inside add form API", id, formName)
+        const form = new Form({formName})
+        await form.save()
+        res.status(201).json({message:"New Form Created"})
+    } catch (error) {
+
+    }
+
 }
 
 export const addClient = async (req, res, next) => {
@@ -37,7 +59,7 @@ export const addClient = async (req, res, next) => {
         console.log("inside add API", id, clientName)
         const client = new Client({ clientName: clientName, user_id: id })
         await client.save();
-        return res.status(200).json({message: "Client Added Successfully"})
+        return res.status(200).json({ message: "Client Added Successfully" })
     } catch (error) {
         return res.status(500).json({ message: "Error Adding clients", error: error.message });
     }

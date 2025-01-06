@@ -7,8 +7,42 @@ import { createToken } from "../utils/TokenManager.js";
 import Client from "../models/Clients.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const COOKIE_NAME = "AuthToken";
 
+export const fetchClients = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        console.log("req id", id);
+
+        const clients = await Client.find({ user_id: id });
+        console.log("fetched clients", clients)
+        return res.status(200).json(clients);
+    } catch (error) {
+        console.error("Error fetching clients:", error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+export const getForms = async (req, res, next) => {
+    
+}
+
+export const addForms = async (req, res, next) => {
+    
+}
+
+export const addClient = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const { clientName } = req.body
+        console.log("inside add API", id, clientName)
+        const client = new Client({ clientName: clientName, user_id: id })
+        await client.save();
+        return res.status(200).json({message: "Client Added Successfully"})
+    } catch (error) {
+        return res.status(500).json({ message: "Error Adding clients", error: error.message });
+    }
+
+}
 
 export const getAllUsers = async (req, res, next) => {
     try {
@@ -82,7 +116,8 @@ export const signin = async (req, res, next) => {
             message: "OK",
             name: checkUser.name,
             email: checkUser.email,
-            token: token
+            token: token,
+            id: checkUser.id
         });
     } catch (error) {
         console.log("error", error)

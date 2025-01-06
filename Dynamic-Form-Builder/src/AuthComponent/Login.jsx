@@ -65,8 +65,9 @@ function Login() {
                 setDialogContent({ title: 'Login Success', description: 'You have successfully logged into your account.' });
                 setDialogOpen(true);
                 localStorage.setItem('token', response.data.token);
+                console.log("response line 68", response.data)
                 setTimeout(() => {
-                    navigate('/form-builder');
+                    navigate(`/clients/${response.data.id}`);
                 }, 2000);
             } catch (err) {
                 console.error('Error:', err);

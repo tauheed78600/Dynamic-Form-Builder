@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"
 import EmbedForm from "./EmbedForm";
 import Login from "./AuthComponent/Login";
 import Register from "./AuthComponent/Register";
+import ClientList from "./ClientComponent/ClientPage";
+import FormPage from "./FormsComponent/FormPage";
 
 const ProtectedRoute = ({ element }) => {
   const token = localStorage.getItem("token");
@@ -16,6 +18,18 @@ const isLoggedIn = () =>{
 }
 
 const router = createBrowserRouter([
+  {
+    path: "/clients/:id",
+    element: (
+      <ProtectedRoute element={<ClientList />} />
+    ),
+  },
+  {
+    path: "clients/:id/forms/:id",
+    element: (
+      <ProtectedRoute element={<FormPage />} />
+    ),
+  },
   {
     path: "/login",
     element: <Login />,

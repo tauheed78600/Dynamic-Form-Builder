@@ -102,7 +102,7 @@ function Login() {
                             autoComplete="off"
                             name="email"
                             value={form.email}
-                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[400px] pl-10 pr-12 ${touched.email && errors.email ? 'border-red-500' : ''
+                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.email && errors.email ? 'border-red-500' : ''
                                 }`}
                         />
                         <Mail className="absolute right-6 mt-3 text-gray-200" />
@@ -119,7 +119,7 @@ function Login() {
                             onBlur={handleBlur}
                             name="password"
                             value={form.password}
-                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[400px] pl-10 pr-12 ${touched.password && errors.password ? 'border-red-500' : ''
+                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.password && errors.password ? 'border-red-500' : ''
                                 }`}
                         />
                         <Lock className="absolute right-6 mt-3 text-gray-200" />
@@ -135,7 +135,7 @@ function Login() {
                         <button
                             onClick={handleSubmit}
                             type="submit"
-                            className="bg-transparent text-white border border-white font-extrabold text-2xl hover:bg-gray-50 hover:border-black w-[400px] mt-2 h-14 rounded-full"
+                            className="bg-transparent text-white border border-white font-extrabold text-2xl hover:bg-gray-50 hover:border-black w-[100%] mt-2 h-14 rounded-full"
                         >
                             Login
                         </button>

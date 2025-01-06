@@ -7,6 +7,17 @@ export const fetchClients = async(id) =>{
     return res
 }
 
+export const editClient = async(id, clientName) =>{
+  const res = await axios.put(`http://localhost:3125/api/auth/editClient/${id}`,{
+    clientName
+  })
+  return res
+}
+
+export const deleteClient12 = async (id) => {
+  const res = await axios.delete(`http://localhost:3125/api/auth/deleteClient/${id}`)
+  return res
+}
 
 export const addClients = async (id, clientName) => {
     console.log("id, clientName", id, clientName)

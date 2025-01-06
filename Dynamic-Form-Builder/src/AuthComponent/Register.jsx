@@ -4,7 +4,6 @@ import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import validator from "validator";
-import MicrosoftLogin from "react-microsoft-login";
 import {
   Dialog,
   DialogContent,

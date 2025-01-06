@@ -9,6 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog.tsx';
+import { Edit, Trash2 } from 'lucide-react';
+import { addForms } from '../APICalls/FormAPIs';
 
 const FormPage = () => {
   const [client, setClient] = useSearchParams();
@@ -40,8 +42,8 @@ const FormPage = () => {
   const handleAddForm = () =>{
     const addForm = async () => {
       try {
-        const res = await addForm(params.id, formName)
-        console.log('Response of addClient:', res);
+        const res = await addForms(params.id, formName)
+        console.log('Response of addForm:', res);
         if (res.status === 200) {
           setForms(prevForms => [...prevForms, { formName }]);
           showAddForm(false)
@@ -52,6 +54,8 @@ const FormPage = () => {
     }
     addForm()
   }
+
+  console.log("forms line 58", forms)
 
   return (
     <div className="container">
@@ -68,20 +72,20 @@ const FormPage = () => {
             <li key={index} className="form-item">
               <div className="form-item-content">
                 <span className="bullet">•</span>
-                <span>{form}</span>
+                <span>{form.formName}</span>
               </div>
               <div className="form-item-actions">
                 <button
                   className="icon-button"
                   aria-label="Edit form"
                 >
-                  <img src="/edit.png" alt="Edit" className="action-icon" />
+                  <Edit/>
                 </button>
                 <button
                   className="icon-button"
                   aria-label="Delete form"
                 >
-                  <img src="/del.png" alt="Delete" className="action-icon" />
+                  <Trash2/>
                 </button>
               </div>
             </li>

@@ -23,12 +23,48 @@ export const fetchClients = async (req, res, next) => {
     }
 }
 
+
+
+export const deleteClient = async (req, res, next) => {
+    try{
+        const { id } = req.params;
+    }catch(error){
+
+    }
+}
+
+
+export const editClient = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { clientName } = req.body;
+
+    if (!id || !clientName) {
+      return res.status(400).json({ message: 'Client ID and Client Name are required' });
+    }
+
+    console.log('Request received:', { id, clientName });
+
+
+    const client = Client.find()
+
+    return res.status(200).json({
+      message: 'Client updated successfully',
+      client: updatedClient,
+    });
+  } catch (error) {
+    console.error('Error updating client:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+
 export const getForms = async (req, res, next) => {
     try {
         const { id } = req.params;
         console.log("req id", id);
 
-        const forms = await Form.find({ user_id: id });
+        const forms = await Form.find({ clientId: id });
         console.log("fetched forms", forms)
         return res.status(200).json(forms);
     } catch (error) {
@@ -43,16 +79,16 @@ export const addForms = async (req, res, next) => {
         const { id } = req.params
         const { formName } = req.body
         console.log("inside add form API", id, formName)
-        const form = new Form({formName})
+        const form = new Form({formName: formName, clientId: id})
         await form.save()
-        res.status(201).json({message:"New Form Created"})
+        res.status(200).json({message:"New Form Created"})
     } catch (error) {
-
+        console.log("error in adding form", error)
+        return res.status(500).json({ message: "Error Adding Form", error: error.message });
     }
-
 }
 
-export const addClient = async (req, res, next) => {
+export const addClient = async(req, res, next) => {
     try {
         const { id } = req.params
         const { clientName } = req.body

@@ -1,0 +1,16 @@
+.embedded-form-wrapper {
+  display: flex;
+}
+
+.content {
+  height: 100vh;
+  width: 60%;
+  float: left;
+  background-color: bisque;
+}
+
+.embedded-form {
+  margin: 10px;
+  width: 40%;
+  float: right;
+}

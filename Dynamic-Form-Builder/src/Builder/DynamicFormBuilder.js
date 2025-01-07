@@ -6,6 +6,7 @@ export default function DynamicFormBuilder() {
   const [formLayout, setFormLayout] = useState([]);
   const [formName, setFormName] = useState("Form Name");
   const [edit, setEdit] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   function changeFormLayout(form) {
     setFormLayout(form);
@@ -37,9 +38,8 @@ export default function DynamicFormBuilder() {
       },
     ];
     changeFormLayout(form);
+    setLoading(false);
   }
-
-
 
   async function saveFormLayout() {
     try {
@@ -102,12 +102,18 @@ export default function DynamicFormBuilder() {
         </div>
       </div>
       <div className="dynamic-form-builder">
-        {console.log(formLayout)}
-        <FormBuilder
-          display={"form"}
-          components={formLayout}
-          onChange={(schema) => changeFormLayout(schema)}
-        />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            {console.log(formLayout)}
+            <FormBuilder
+              display={"form"}
+              components={formLayout}
+              onChange={changeFormLayout}
+            />
+          </>
+        )}
       </div>
     </div>
   );

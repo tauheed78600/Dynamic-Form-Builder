@@ -24,12 +24,61 @@ export const fetchClients = async (req, res, next) => {
 }
 
 
+export const editForm = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { formName } = req.body;
+    
+        if (!id || !formName) {
+          return res.status(400).json({ message: 'Form ID and Form Name are required' });
+        }
+    
+        console.log('Request received:', { id, formName });
+    
+    
+        const updatedForm = await Form.findByIdAndUpdate(
+            id,
+            { formName },
+            { new: true, runValidators: true }
+          );
+        
+          console.log("updated form line 55", updatedForm)
+        return res.status(200).json({
+          message: 'Form updated successfully',
+          form: updatedForm,
+        });
+      } catch (error) {
+        console.error('Error updating client:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+      }
+}
+
+export const deleteForm = async (req, res, next) => {
+    try {
+        
+        const { id } = req.params;
+        console.log("inside deleteForm", id)
+        const result = await Form.deleteOne({ _id: id });
+
+    
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: 'Form not found' });
+        }
+    
+        return res.status(200).json({ message: 'Form Deleted Successfully' });
+      } catch (error) {
+        console.error("Error in deleteForm:", error);
+        return res.status(500).json({ message: 'An error occurred', error });
+      }
+}
 
 export const deleteClient = async (req, res, next) => {
     try {
       const { id } = req.params;
   
       const result = await Client.deleteOne({ _id: id });
+
+      await Form.deleteMany({clientId:id})
   
       if (result.deletedCount === 0) {
         return res.status(404).json({ message: 'Client not found' });
@@ -56,16 +105,16 @@ export const editClient = async (req, res, next) => {
     console.log('Request received:', { id, clientName });
 
 
-    const updatedClient = await Client.findByIdAndUpdate(
+    const updatedForm = await Client.findByIdAndUpdate(
         id,
         { clientName },
         { new: true, runValidators: true }
       );
     
-      console.log("updated client line 55", updatedClient)
+      console.log("updated client line 55", updatedForm)
     return res.status(200).json({
       message: 'Client updated successfully',
-      client: updatedClient,
+      client: updatedForm,
     });
   } catch (error) {
     console.error('Error updating client:', error);

@@ -10,12 +10,13 @@
     height: 100%;
     width: 100%;
     background-color: #f5f7fa;
+    margin: 0;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
   
   /* Main container styles */
   .container {
-    min-height: 100vh;
+    height: 100%;
     width: 100%;
     padding: 2rem;
     background-color: #ffffff;
@@ -25,11 +26,11 @@
   .divHeader {
     display: flex;
     align-items: center;
+    height: 100%;
     justify-content: space-between;
     padding: 1.5rem 2rem;
     background-color: #ffffff;
     border-bottom: 1px solid #eaedf0;
-
     top: 0;
   }
   
@@ -105,8 +106,9 @@
   
   .client-item:hover {
     background-color: #f7fafc;
-    transform: translateX(4px);
+    /* transform: translateX(4px); */
     cursor: pointer;
+    z-index: -1;
   }
   
   /* Bullet point styling */
@@ -118,7 +120,7 @@
   }
   
   .client-item:hover .bullet {
-    transform: scale(1.2);
+    /* transform: scale(1.2); */
   }
   
   /* Responsive design */

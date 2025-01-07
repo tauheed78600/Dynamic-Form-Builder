@@ -12,10 +12,14 @@ const ProtectedRoute = ({ element }) => {
   return token ? element : <Navigate to="/login" replace />;
 };
 
-const isLoggedIn = () =>{
+const isLoggedIn = () => {
   const token = localStorage.getItem("token");
-  return token ? <Navigate to='/form-builder'/> : <Navigate to='/login'/>
-}
+  if (token) {
+    return <Navigate to={`/clients/${localStorage.getItem("userid")}`} />; 
+  } else {
+    return <Login/>;
+  }
+};
 
 const router = createBrowserRouter([
   {
@@ -25,18 +29,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "clients/:id/forms/:id",
+    path: "clients/:clientId/forms/:formId",
     element: (
       <ProtectedRoute element={<FormPage />} />
     ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: isLoggedIn(),
   },
   {
     path: "/register",
-    element: <Register />,
+    element: <Register/>,
   },
   {
     path: "/form-builder",

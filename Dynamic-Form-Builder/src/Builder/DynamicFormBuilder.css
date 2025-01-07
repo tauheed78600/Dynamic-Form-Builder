@@ -1,0 +1,136 @@
+.form-builder-wrapper {
+  padding: 10px;
+}
+
+.dynamic-form-builder {
+  padding: 10px 0;
+}
+
+#saveButtonDiv {
+  padding: 10px;
+  text-align: right;
+}
+
+
+#saveFormButton {}
+
+.formio.builder.row.formbuilder {
+  width: 99vw;
+  padding: 0 1vw;
+}
+
+.builder-components.drag-container.formio-builder-form {
+  min-height: 450px;
+}
+
+
+.btn.btn-block.builder-group-button {
+  width: 100%;
+}
+
+
+.drag-and-drop-alert.alert.alert-info.no-drag {
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+
+
+.col-xs-4.col-sm-3.col-md-2.formcomponents {
+  width: 50%;
+}
+
+.col-xs-8.col-sm-9.col-md-10.formarea {
+  width: 50%;
+  border: 1px solid grey;
+  border-radius: 0px 5px 5px 0px;
+  padding: 10px;
+}
+
+.col-xs-4.col-sm-3.col-md-2.formcomponents {
+  border: 1px  solid grey;
+  border-width: 1px 0px 1px 1px;
+  border-radius: 5px 0px 0px 5px;
+  padding: 10px;
+}
+
+.btn.btn-primary.btn-sm.btn-block.formcomponent.drag-copy.gu-mirror {
+  text-align: left;
+}
+
+.card-body.no-drop.p-2 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 5px;
+}
+
+.card-body.no-drop.p-2 span {
+ 
+}
+
+
+.btn.btn-primary.btn-sm.btn-block.formcomponent.drag-copy {
+  border-radius: 4px 10px;
+}
+
+.card.form-builder-panel {
+  margin: 5px 0;
+}
+
+#form-header {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+#form-header div {
+  padding: 0 20px;
+}
+
+#form-title {
+  position: relative;
+  display: inline-flex;
+}
+
+.form-title-img {
+  position: absolute;
+  right: 0;
+}
+
+
+#form-title img {
+  height: 18px;
+  width: 18px;
+}
+
+@media screen and (min-width: 1024px) {
+  .card-body.no-drop.p-2 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+
+  .btn.btn-primary.btn-sm.btn-block.formcomponent.drag-copy {
+    height: 34px;
+  }
+}
+
+/* #group-basic {
+  display: block !important;
+}
+
+#group-advanced {
+  display: block !important;
+}
+
+#group-layout {
+  display: block !important;
+}
+
+#group-data {
+  display: block !important;
+}
+
+#group-premium {
+  display: block !important;
+} */

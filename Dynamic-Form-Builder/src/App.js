@@ -1,5 +1,5 @@
 import "./App.css";
-import DynamicFormBuilder from "./DynamicFormBuilder";
+import DynamicFormBuilder from "./Builder/DynamicFormBuilder";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import EmbedForm from "./EmbedForm";
 import Login from "./AuthComponent/Login";

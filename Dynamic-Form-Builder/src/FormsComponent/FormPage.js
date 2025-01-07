@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './FormPage.css';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { fetchFormData } from '../APICalls/FormAPIs';
 import {
   Dialog,
@@ -15,11 +15,13 @@ import { addForms } from '../APICalls/FormAPIs';
 const FormPage = () => {
   const [client, setClient] = useSearchParams();
   const clientName = client.get('client');
-  const [forms, setForms] = useState([])
-  const [addForm, showAddForm] = useState(false)
-  const [formName, setFormName] = useState('')
+  const [forms, setForms] = useState([]);
+  const [addForm, showAddForm] = useState(false);
+  const [formName, setFormName] = useState('');
 
-  const params = useParams()
+
+  const params = useParams();
+  const navigate = useNavigate();
   console.log("params in line 11 forms", params.id)
 
   useEffect(()=>{
@@ -56,6 +58,7 @@ const FormPage = () => {
   }
 
   console.log("forms line 58", forms)
+  
 
   return (
     <div className="container">
@@ -69,7 +72,9 @@ const FormPage = () => {
       <main className="main-content">
         <ul className="form-list">
           {forms.map((form, index) => (
-            <li key={index} className="form-item">
+            <li key={index} className="form-item" onClick={()=>{
+              navigate(`/form-builder/?clientId=${params.id}&formId=${form._id}`);
+            }}>
               <div className="form-item-content">
                 <span className="bullet">•</span>
                 <span>{form.formName}</span>

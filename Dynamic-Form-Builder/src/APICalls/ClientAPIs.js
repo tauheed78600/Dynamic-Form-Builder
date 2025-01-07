@@ -14,6 +14,18 @@ export const editClient = async(id, clientName) =>{
   return res
 }
 
+export const editForm = async (id, formName) => {
+  const res = await axios.put(`http://localhost:3125/api/auth/editForm/${id}`,{
+    formName
+  })
+  return res
+}
+
+export const deleteForm = async(id) =>{
+  const res = await axios.delete(`http://localhost:3125/api/auth/deleteForm/${id}`)
+  return res
+}
+
 export const deleteClient12 = async (id) => {
   const res = await axios.delete(`http://localhost:3125/api/auth/deleteClient/${id}`)
   return res

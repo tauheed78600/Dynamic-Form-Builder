@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog.tsx';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, MenuIcon, Trash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ClientList = () => {
@@ -20,6 +20,7 @@ const ClientList = () => {
   const [editedClientName, setEditedClientName] = useState('');
   const [deleteClientModal, showDeleteModal] = useState(false);
   const [clientToDelete, setClientToDelete] = useState(null);
+  const [sidebar, showSidebar] = useState(false)
 
   const params = useParams();
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const ClientList = () => {
           client._id === id ? { ...client, clientName: res.data.client.clientName } : client
         )
       );
-      setEditIndex(false);
+      setEditIndex(null);
     } catch (error) {
       console.error('Error in saveEditedClient:', error);
     }
@@ -102,27 +103,77 @@ const ClientList = () => {
     showDeleteModal(true);
   };
 
+  const handleLogout = () =>{
+    localStorage.removeItem('token')
+    localStorage.removeItem('userid')
+    localStorage.removeItem('formToken')
+    navigate('/login')
+  }
+
   return (
     <div className="container">
-      <div className="divHeader">
-        <div className="menu-icon">☰</div>
-        <h1>CLIENTS</h1>
-        <button onClick={() => showAddClient(true)} className="new-client-button">
-          + New Client
-        </button>
+      <div className="flex justify-between">
+        <div className="">
+          <MenuIcon className='h-10 w-10' onClick={() => showSidebar(true)} />
+        </div>
+        <div
+          className={`fixed h-full bg-white left-0 top-0 w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
+            } transition-transform duration-500 ease-in-out z-10`}
+        >
+          <div className="flex justify-between items-center p-4 border-b border-gray-300">
+            <div>
+
+              <h2 className='text-3xl font-extrabold'>Clients List</h2>
+            </div>
+            <span
+              onClick={() => showSidebar(false)}
+              className="h-6 w-6 cursor-pointer"
+            >X</span>
+          </div>
+          <div className="p-4">
+            {clients.map((client, index) => (
+              <li key={index} className="client-item">
+                <div
+                  onClick={() => handleClientClick(client._id)}
+                  className="client-item-content"
+                  style={{ cursor: editIndex === index ? 'not-allowed' : 'pointer' }}
+                >
+                  <span className="bullet">•</span>
+                  
+                    <span>{client.clientName}</span>
+                </div>
+              </li>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h1 className='text-center text-6xl text-blue-600'>Dynamic Form Builder</h1>
+        </div>
+        <div>
+          <button onClick={handleLogout} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
+        </div>
       </div>
+      <div className=''>
+        <h1 className='text-center'>Clients</h1>
+      </div>
+      <hr className='mt-4' />
       <main>
         <ul className="client-list">
+          <div className='flex justify-end'>
+            <button onClick={() => showAddClient(true)} className="new-client-button">
+              + New Client
+            </button>
+          </div>
           {clients.map((client, index) => (
             <li key={index} className="client-item">
               <div
                 onClick={() => handleClientClick(client._id)}
-                className="client-item-content"
+                className="client-item-content mt-6"
                 style={{ cursor: editIndex === index ? 'not-allowed' : 'pointer' }}
               >
                 <span className="bullet">•</span>
                 {editIndex === index ? (
-                  <div className="flex flex-row gap-4">
+                  <div className="flex flex-row gap-2">
                     <input
                       value={editedClientName}
                       onChange={handleEditChange}
@@ -133,6 +184,12 @@ const ClientList = () => {
                       className="border bg-blue-600 rounded-lg h-10 w-24 text-white"
                     >
                       Save
+                    </button>
+                    <button
+                      onClick={() => setEditIndex(null)}
+                      className="border bg-red-600 rounded-lg h-10 w-24 text-white"
+                    >
+                      Cancel
                     </button>
                   </div>
                 ) : (
@@ -172,10 +229,10 @@ const ClientList = () => {
               <DialogDescription>
                 <span className="mt-20 text-lg">
                   <div className="flex flex-row gap-2">
-                    <label>Enter Client Name</label>
+                    <label className=''>Enter Client Name</label>
                     <input
                       onChange={handleChange}
-                      className="border border-black h-[35px]"
+                      className="border border-black h-[35px] p-2 text-sm"
                     ></input>
                   </div>
                   <button
@@ -204,13 +261,13 @@ const ClientList = () => {
                     onClick={handleDeleteClient}
                     className="bg-red-600 h-10 w-24"
                   >
-                    Yes
+                    Okay
                   </button>
                   <button
                     onClick={() => showDeleteModal(false)}
                     className="bg-blue-600 h-10 w-24"
                   >
-                    No
+                    Cancel
                   </button>
                 </div>
               </DialogDescription>

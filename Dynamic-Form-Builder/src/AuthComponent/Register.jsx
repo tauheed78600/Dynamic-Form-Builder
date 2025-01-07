@@ -36,16 +36,25 @@ function Register() {
   const [success, setSuccess] = useState(false);
 
   const validateEmail = (email) => {
-    return validator.isEmail(email) ? "" : "Invalid email address";
-  };
+    if(email===''){
+        return 'Email cannot be empty'
+    }
+    return validator.isEmail(email) ? '' : 'Invalid email address';
+};
 
-  const validatePassword = (password) => {
+const validatePassword = (password) => {
+    if(password === ''){
+        return 'Password cannot be empty'
+    }
     return validator.isStrongPassword(password)
-      ? ""
-      : "Password must be at least 8 characters long, include uppercase, lowercase, number, and a special character.";
-  };
+        ? ''
+        : 'Password must be at least 8 characters long, include uppercase, lowercase, number, and a special character.';
+};
 
   const validateName = (name) => {
+    if (name === ''){
+      return "Name must not be empty"
+    }
     if (!validator.isAlpha(name)) {
       return "Name must contain only Alphabets";
     }
@@ -132,7 +141,7 @@ function Register() {
   return (
     <div className="flex justify-center mt-10">
       <div
-        className="border-2 relative h-auto w-[30%] border-black rounded-3xl shadow-2xl bg-cover"
+        className="border-2 relative h-auto w-[30%]  rounded-3xl shadow-2xl bg-cover"
         style={{ backgroundImage: "url('formBG.png')" }}
       >
         <div className="p-4 ml-2">

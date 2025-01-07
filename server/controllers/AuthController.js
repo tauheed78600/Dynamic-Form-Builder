@@ -26,12 +26,22 @@ export const fetchClients = async (req, res, next) => {
 
 
 export const deleteClient = async (req, res, next) => {
-    try{
-        const { id } = req.params;
-    }catch(error){
-
+    try {
+      const { id } = req.params;
+  
+      const result = await Client.deleteOne({ _id: id });
+  
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ message: 'Client not found' });
+      }
+  
+      return res.status(200).json({ message: 'Deleted Successfully' });
+    } catch (error) {
+      console.error("Error in deleteClient:", error);
+      return res.status(500).json({ message: 'An error occurred', error });
     }
-}
+  };
+  
 
 
 export const editClient = async (req, res, next) => {
@@ -46,8 +56,13 @@ export const editClient = async (req, res, next) => {
     console.log('Request received:', { id, clientName });
 
 
-    const client = Client.find()
-
+    const updatedClient = await Client.findByIdAndUpdate(
+        id,
+        { clientName },
+        { new: true, runValidators: true }
+      );
+    
+      console.log("updated client line 55", updatedClient)
     return res.status(200).json({
       message: 'Client updated successfully',
       client: updatedClient,

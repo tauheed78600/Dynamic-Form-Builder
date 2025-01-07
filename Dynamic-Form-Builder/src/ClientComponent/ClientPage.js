@@ -86,7 +86,7 @@ const ClientList = () => {
   const handleDeleteClient = async () => {
     try {
       const res = await deleteClient12(clientToDelete);
-      console.log("Delete response:", res);
+      console.log("Delete response1234:", res);
       if (res.status === 200) {
         setClients((prevClients) => prevClients.filter((client) => client._id !== clientToDelete));
         showDeleteModal(false);

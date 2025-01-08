@@ -6,6 +6,7 @@ import bcrypt from "bcrypt"
 import { createToken } from "../utils/TokenManager.js";
 import Client from "../models/Clients.js";
 import Form from "../models/Forms.js";
+import FormData from "../models/FormData.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -24,102 +25,246 @@ export const fetchClients = async (req, res, next) => {
 }
 
 
+export const addFormData = async (req, res, next) => {
+    const { id } = req.params;
+    const { formLayout } = req.body;
+
+    try {
+        const form = await Form.findById(id);
+        if (!form) {
+            return res.status(404).json({ message: "Form not found" });
+        }
+
+        form.formLayout = formLayout;
+
+        console.log("Form before save:", form);
+
+        const updatedForm = await form.save();
+
+        console.log("Form after save:", updatedForm);
+        res.status(200).json({ message: "Added Form Layout", form });
+    } catch (error) {
+        console.error("Error in adding form layout:", error);
+        return res.status(500).json({
+            message: "Error Adding Form layout",
+            error: error.message
+        });
+    }
+};
+
+export const saveFormData = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        console.log("inside saveFormData", req.body, id);
+
+        const updatedDocument = await FormData.findOneAndUpdate(
+            { _id: id },
+            { $set: req.body },
+            { new: true, upsert: true, strict: false }
+        );
+
+        return res.status(200).json({
+            message: 'Form Details SuccessFully Saved',
+            data: updatedDocument,
+        });
+    } catch (error) {
+        console.error('Error in saveFormData:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+        });
+    }
+};
+
+export const getFormDetails = async (req, res, next) => {
+    try{
+        const { id } = req.params
+        
+    }catch(error){
+
+    }
+}
+
+export const getFormHTML = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        console.log("inside getFormHTML", id)
+        const form = await Form.findById(id)
+        console.log("form line 59", form.formLayout)
+        if (!form) {
+            console.log("inside form not found")
+            return res.status(404).json({ message: 'Form not Found' });
+        }
+        return res.send(`
+        <html>
+          <head>
+            <link
+              rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            />
+            <link
+              rel="stylesheet"
+              href="https://cdn.form.io/formiojs/formio.full.min.css"
+            />
+          </head>
+          <body>
+            <div id="formio"></div>
+            <script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+            <script>
+              Formio.createForm(document.getElementById('formio'), {
+                    components: ${JSON.stringify(form.formLayout)}
+                    }).then(function(formInstance) {
+                    let messageContainers = document.querySelectorAll('[ref="buttonMessageContainer"]');
+                    messageContainers.forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    formInstance.on('submit', function(submission) {
+                        const submissionData = submission.data;
+                        console.log(submissionData);
+                        fetch('http://localhost:3125/api/auth/saveFormData/${id}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(submissionData)
+                        }).then(response => {
+                        formInstance.emit('submitDone', submission);
+                        if (response.status !== 200) {
+                            alert('Could not submit data');
+                            console.log('Could not submit data');
+                        } else {
+                            alert('Submitted data');
+                        }
+                        return response.json();
+                        }).then(message => console.log(message))
+                    });
+                    }).catch(error => {
+                    console.error('Form initialization error:', error);
+                    });
+            </script>
+          </body>
+        </html>
+            `);
+
+    } catch (error) {
+        console.error('Error getting Form HTML:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+}
+
+export const getFormData = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        console.log("inside getFormData876543", id)
+        const form = await Form.findById(id)
+        if (!form) {
+            return res.status(404).json({ message: 'Form not Found' });
+        }
+        return res.status(200).json({
+            message: "Form Details",
+            formLayout: form.formLayout,
+            formName: form.formName
+        })
+    } catch (error) {
+        console.error('Error getting form:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+}
+
 export const editForm = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { formName } = req.body;
-    
+
         if (!id || !formName) {
-          return res.status(400).json({ message: 'Form ID and Form Name are required' });
+            return res.status(400).json({ message: 'Form ID and Form Name are required' });
         }
-    
+
         console.log('Request received:', { id, formName });
-    
-    
+
+
         const updatedForm = await Form.findByIdAndUpdate(
             id,
             { formName },
             { new: true, runValidators: true }
-          );
-        
-          console.log("updated form line 55", updatedForm)
+        );
+
+        console.log("updated form line 55", updatedForm)
         return res.status(200).json({
-          message: 'Form updated successfully',
-          form: updatedForm,
+            message: 'Form updated successfully',
+            form: updatedForm,
         });
-      } catch (error) {
+    } catch (error) {
         console.error('Error updating client:', error);
         return res.status(500).json({ message: 'Internal server error', error: error.message });
-      }
+    }
 }
 
 export const deleteForm = async (req, res, next) => {
     try {
-        
+
         const { id } = req.params;
         console.log("inside deleteForm", id)
         const result = await Form.deleteOne({ _id: id });
 
-    
+
         if (result.deletedCount === 0) {
-          return res.status(404).json({ message: 'Form not found' });
+            return res.status(404).json({ message: 'Form not found' });
         }
-    
+
         return res.status(200).json({ message: 'Form Deleted Successfully' });
-      } catch (error) {
+    } catch (error) {
         console.error("Error in deleteForm:", error);
         return res.status(500).json({ message: 'An error occurred', error });
-      }
+    }
 }
 
 export const deleteClient = async (req, res, next) => {
     try {
-      const { id } = req.params;
-  
-      const result = await Client.deleteOne({ _id: id });
+        const { id } = req.params;
 
-      await Form.deleteMany({clientId:id})
-  
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ message: 'Client not found' });
-      }
-  
-      return res.status(200).json({ message: 'Deleted Successfully' });
+        const result = await Client.deleteOne({ _id: id });
+
+        await Form.deleteMany({ clientId: id })
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Client not found' });
+        }
+
+        return res.status(200).json({ message: 'Deleted Successfully' });
     } catch (error) {
-      console.error("Error in deleteClient:", error);
-      return res.status(500).json({ message: 'An error occurred', error });
+        console.error("Error in deleteClient:", error);
+        return res.status(500).json({ message: 'An error occurred', error });
     }
-  };
-  
+};
+
 
 
 export const editClient = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { clientName } = req.body;
+    try {
+        const { id } = req.params;
+        const { clientName } = req.body;
 
-    if (!id || !clientName) {
-      return res.status(400).json({ message: 'Client ID and Client Name are required' });
+        if (!id || !clientName) {
+            return res.status(400).json({ message: 'Client ID and Client Name are required' });
+        }
+
+        console.log('Request received:', { id, clientName });
+
+
+        const updatedForm = await Client.findByIdAndUpdate(
+            id,
+            { clientName },
+            { new: true, runValidators: true }
+        );
+
+        console.log("updated client line 55", updatedForm)
+        return res.status(200).json({
+            message: 'Client updated successfully',
+            client: updatedForm,
+        });
+    } catch (error) {
+        console.error('Error updating client:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-
-    console.log('Request received:', { id, clientName });
-
-
-    const updatedForm = await Client.findByIdAndUpdate(
-        id,
-        { clientName },
-        { new: true, runValidators: true }
-      );
-    
-      console.log("updated client line 55", updatedForm)
-    return res.status(200).json({
-      message: 'Client updated successfully',
-      client: updatedForm,
-    });
-  } catch (error) {
-    console.error('Error updating client:', error);
-    return res.status(500).json({ message: 'Internal server error', error: error.message });
-  }
 };
 
 
@@ -143,16 +288,16 @@ export const addForms = async (req, res, next) => {
         const { id } = req.params
         const { formName } = req.body
         console.log("inside add form API", id, formName)
-        const form = new Form({formName: formName, clientId: id})
+        const form = new Form({ formName: formName, clientId: id })
         await form.save()
-        res.status(200).json({message:"New Form Created"})
+        res.status(200).json({ message: "New Form Created" })
     } catch (error) {
         console.log("error in adding form", error)
         return res.status(500).json({ message: "Error Adding Form", error: error.message });
     }
 }
 
-export const addClient = async(req, res, next) => {
+export const addClient = async (req, res, next) => {
     try {
         const { id } = req.params
         const { clientName } = req.body

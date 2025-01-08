@@ -10,7 +10,12 @@ import {
     editClient, 
     deleteClient,
     deleteForm,
-    editForm } from "../controllers/AuthController.js";
+    editForm,
+    addFormData,
+    getFormData,
+    getFormHTML,
+    saveFormData,
+    getFormDetails } from "../controllers/AuthController.js";
 
 const AuthRoute = Router()
 AuthRoute.post("/signin", signin)
@@ -25,5 +30,11 @@ AuthRoute.put('/editClient/:id', editClient)
 AuthRoute.delete('/deleteClient/:id', deleteClient)
 AuthRoute.delete('/deleteForm/:id', deleteForm)
 AuthRoute.put('/editForm/:id', editForm)
+AuthRoute.put('/addFormData/:id', addFormData)
+AuthRoute.get('/getFormData/:id', getFormData)
+AuthRoute.get('/getFormHTML/:id', getFormHTML)
+AuthRoute.post('/saveFormData/:id', saveFormData)
+AuthRoute.get('/form-details/:id', getFormDetails)
+
 
 export default AuthRoute

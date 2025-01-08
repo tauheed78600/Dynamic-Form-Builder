@@ -6,6 +6,7 @@ import Login from "./AuthComponent/Login";
 import Register from "./AuthComponent/Register";
 import ClientList from "./ClientComponent/ClientPage";
 import FormPage from "./FormsComponent/FormPage";
+import FormDetails from "./Builder/FormDetails";
 
 const ProtectedRoute = ({ element }) => {
   const token = localStorage.getItem("token");
@@ -20,6 +21,8 @@ const isLoggedIn = () => {
     return <Login/>;
   }
 };
+
+const userId = localStorage.getItem("userid")
 
 const router = createBrowserRouter([
   {
@@ -54,6 +57,10 @@ const router = createBrowserRouter([
       <ProtectedRoute element={<EmbedForm />} />
     ),
   },
+  {
+    path: '/form-details/:clientId/:formId',
+    element: <FormDetails userid = {userId} />
+  }
 ]);
 
 function App() {

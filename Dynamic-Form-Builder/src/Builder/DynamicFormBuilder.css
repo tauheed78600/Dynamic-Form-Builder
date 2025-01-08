@@ -9,10 +9,11 @@
 #saveButtonDiv {
   padding: 10px;
   text-align: right;
+  width: 200px;
 }
 
 
-#saveFormButton {}
+
 
 .formio.builder.row.formbuilder {
   width: 99vw;

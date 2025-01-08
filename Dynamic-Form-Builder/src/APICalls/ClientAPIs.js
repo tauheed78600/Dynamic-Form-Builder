@@ -7,6 +7,24 @@ export const fetchClients = async(id) =>{
     return res
 }
 
+export const fetchFormDetails = async(id)=>{
+  const res = await axios.get(`http://localhost:3125/api/auth/form-details/${id}`)
+  return res
+}
+
+export const getFormData = async(id)=>{
+  console.log("id getForm", id)
+  const res = await axios.get(`http://localhost:3125/api/auth/getFormData/${id}`)
+  return res
+}
+
+export const addFormData = async(id, formLayout)=>{
+  const res = await axios.put(`http://localhost:3125/api/auth/addFormData/${id}`,{
+    formLayout
+  })
+  return res
+}
+
 export const editClient = async(id, clientName) =>{
   const res = await axios.put(`http://localhost:3125/api/auth/editClient/${id}`,{
     clientName

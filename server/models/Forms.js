@@ -7,6 +7,10 @@ const formSchema = new mongoose.Schema(
       ref: 'Client',
       required: true,
     },
+    formLayout: {
+      type: Object,
+      default: null,
+    },
   },
   { strict: false }
 );

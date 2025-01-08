@@ -129,7 +129,7 @@ const ClientList = () => {
         </div>
         <div
           className={`fixed h-full bg-white left-0 top-0 w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
-            } transition-transform duration-500 ease-in-out z-10`}
+            } transition-transform duration-500 ease-in-out z-10 overflow-y-auto scrollbar-hidden`}
         >
           <div className="flex justify-between items-center p-4 border-b border-gray-300">
             <div>

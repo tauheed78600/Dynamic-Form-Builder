@@ -1,7 +1,7 @@
 import { FormBuilder } from "@tsed/react-formio";
 import { useState, useEffect } from "react";
 import "./DynamicFormBuilder.css";
-import { Check, Clipboard, Copy, Edit2, X } from "lucide-react";
+import { Check, Clipboard, Copy, Edit2, MenuIcon, X } from "lucide-react";
 import { addFormData, getFormData, editForm } from "../APICalls/ClientAPIs";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -22,6 +22,7 @@ export default function DynamicFormBuilder() {
   const [error, showError] = useState(false)
   const [embed, showEmbed] = useState(false)
   const [copySuccess, setCopySuccess] = useState('');
+  const[drop, openDrop] = useState(false)
 
   const location = useLocation();
   const navigate = useNavigate()
@@ -35,7 +36,7 @@ export default function DynamicFormBuilder() {
     setFormLayout(form);
   }
 
-  const handleSubmittedForm = () =>{
+  const handleSubmittedForm = () => {
     navigate(`/form-details/${clientId}/${formId}`)
   }
 
@@ -50,16 +51,43 @@ export default function DynamicFormBuilder() {
     try {
       const res = await editForm(formId, formName);
       console.log("res line 66", res);
+      setEdit(false)
 
     } catch (error) {
       console.error('Error in saveEditedForm:', error);
     }
   }
 
+  const form = [
+    {
+      type: "textfield",
+      key: "firstName",
+      label: "First Name",
+      placeholder: "Enter your first name.",
+      input: true,
+      tooltip: "Enter your <strong>First Name</strong>",
+      description: "Enter your <strong>First Name</strong>",
+    },
+    {
+      type: "textfield",
+      key: "lastName",
+      label: "Last Name",
+      placeholder: "Enter your last name",
+      input: true,
+      tooltip: "Enter your <strong>Last Name</strong>",
+      description: "Enter your <strong>Last Name</strong>",
+    },
+  ];
+
   async function loadFormLayout() {
     const res = await getFormData(formId)
     console.log("response of useEffect line 40", res)
-    changeFormLayout(res.data.formLayout);
+    if (res.data.formLayout !== null) {
+      changeFormLayout(res.data.formLayout);
+    }
+    else {
+      changeFormLayout(form)
+    }
     setFormName(res.data.formName)
     setLoading(false);
   }
@@ -105,7 +133,8 @@ export default function DynamicFormBuilder() {
     <div className="form-builder-wrapper">
       <div id="form-header">
         <div id="form-title">
-          <span style={{ display: edit ? "none" : "block" }}>{formName}</span>
+          <div>
+          <span className="font-extrabold text-2xl" style={{ display: edit ? "none" : "block" }}>{formName}</span>
           <span style={{ display: edit ? "block" : "none" }}>
             <input
               type="text"
@@ -113,6 +142,7 @@ export default function DynamicFormBuilder() {
               onChange={(e) => setFormName(e.target.value)}
             />
           </span>
+          </div>
           <div
             className="form-title-img"
             style={{ display: edit ? "block" : "none" }}
@@ -123,14 +153,14 @@ export default function DynamicFormBuilder() {
             className="form-title-img"
             style={{ display: edit ? "none" : "block" }}
           >
-            <Edit2 className="h-5" onClick={() => setEdit(true)} />
+            <Edit2 className="h-5 ml-9 mt-1" onClick={() => setEdit(true)} />
           </div>
         </div>
-        <div className="inline">Client Name</div>
-        <div className="flex items-center">
+        {/* <div></div> */}
+        <div className="flex items-center buttonDiv">
           <button onClick={handleSubmittedForm} className="bg-blue h-10 w-48 mr-2 bg-blue-600 text-white rounded-xl">
             See Submitted Forms
-            </button>
+          </button>
           <button onClick={() => showEmbed(true)} className="bg-blue h-10 w-36 bg-blue-600 text-white rounded-xl">
             Embed Code
           </button>
@@ -141,6 +171,12 @@ export default function DynamicFormBuilder() {
           >
             Save Changes
           </button>
+        </div>
+        <div className="flexj justify-end ml-24 menuButton relative">
+        <MenuIcon onClick={()=>openDrop(true)}/>
+          <div className="absolute">
+
+          </div>
         </div>
       </div>
       <div className="dynamic-form-builder">
@@ -162,7 +198,7 @@ export default function DynamicFormBuilder() {
             <DialogContent className="h-auto">
               <DialogHeader>
                 <DialogTitle>
-                  <span className="text-2xl text-blue-600 font-extrabold">Generated Embedded Code</span>
+                  <span className="text-2xl text-blue-600 font-extrabold">Embedded Code</span>
                 </DialogTitle>
                 <DialogDescription>
                   <div className="w-[450px]">
@@ -170,17 +206,17 @@ export default function DynamicFormBuilder() {
                       <p>Paste this Embed Code into your website code</p>
                     </span>
                     <div className="relative">
-                      <div className="text-white font-serif bg-gray-700 w-[480px] p-4">
+                      <div className="text-white font-mono bg-gray-700 h-auto w-[450px] p-4 overflow-auto break-words">
                         <button
                           onClick={handleCopy}
-                          className="absolute top-2 -right-5 bg-transparent text-white rounded"
+                          className="absolute top-2 right-2 bg-transparent text-white rounded"
                         >
                           {!copied ? <Clipboard className="h-5" /> : <Check className="h-5" />}
                         </button>
-                        <span className="mt-5 w-auto">{iframeCode}</span>
+                        <span className="mt-1 block">{iframeCode}</span>
                       </div>
-
                     </div>
+
                   </div>
                 </DialogDescription>
               </DialogHeader>

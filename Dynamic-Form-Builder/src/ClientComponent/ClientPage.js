@@ -51,6 +51,8 @@ const ClientList = () => {
         if (res.status === 200) {
           setClients((prevClients) => [...prevClients, { clientName }]);
           showAddClient(false);
+          console.log("res.data._id", res.data.data._id)
+          navigate(`forms/${res.data.data._id}`);
         }
       } catch (error) {
         console.error('Error in addClient:', error);
@@ -117,8 +119,9 @@ const ClientList = () => {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
-    localStorage.removeItem('formToken')
+    window.location.reload()
     navigate('/login')
+    
   }
 
   return (
@@ -142,7 +145,7 @@ const ClientList = () => {
             >X</span>
           </div>
           <div className="p-4">
-            {displayedClients.map((client, index) => (
+            {clients.map((client, index) => (
               <li key={index} className="client-item">
                 <div
                   onClick={() => handleClientClick(client._id)}
@@ -253,11 +256,11 @@ const ClientList = () => {
               </DialogTitle>
               <DialogDescription>
                 <span className="mt-20 text-lg">
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col gap-2">
                     <label className=''>Enter Client Name</label>
                     <input
                       onChange={handleChange}
-                      className="border border-black h-[35px] p-2 text-sm"
+                      className="border border-black h-[40px] rounded-sm p-2 text-sm"
                     ></input>
                   </div>
                   <button

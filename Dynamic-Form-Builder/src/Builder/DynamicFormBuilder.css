@@ -4,6 +4,7 @@
 
 .dynamic-form-builder {
   padding: 10px 0;
+  width: 100%;
 }
 
 #saveButtonDiv {
@@ -11,9 +12,6 @@
   text-align: right;
   width: 200px;
 }
-
-
-
 
 .formio.builder.row.formbuilder {
   width: 99vw;
@@ -67,10 +65,6 @@
   gap: 5px;
 }
 
-.card-body.no-drop.p-2 span {
- 
-}
-
 
 .btn.btn-primary.btn-sm.btn-block.formcomponent.drag-copy {
   border-radius: 4px 10px;
@@ -81,7 +75,8 @@
 }
 
 #form-header {
-  display: grid;
+  display: flex;
+  justify-content: space-between;
   grid-template-columns: repeat(3, 1fr);
 }
 
@@ -91,7 +86,9 @@
 
 #form-title {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
 }
 
 .form-title-img {
@@ -115,6 +112,19 @@
     height: 34px;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .buttonDiv{
+    display: none;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .menuButton{
+   display: none; 
+  }
+}
+
 
 /* #group-basic {
   display: block !important;

@@ -31,14 +31,14 @@ function Login() {
     const navigate = useNavigate();
 
     const validateEmail = (email) => {
-        if(email===''){
+        if (email === '') {
             return 'Email cannot be empty'
         }
         return validator.isEmail(email) ? '' : 'Invalid email address';
     };
 
     const validatePassword = (password) => {
-        if(password === ''){
+        if (password === '') {
             return 'Password cannot be empty'
         }
         return validator.isStrongPassword(password)
@@ -65,6 +65,15 @@ function Login() {
     };
 
     const handleSubmit = async () => {
+        if (form.name === "" || form.email === "" || form.password === "") {
+            console.log("inside fist condition");
+            setDialogContent({
+                title: "Error",
+                description: "Please fill all the fields",
+            });
+            setDialogOpen(true);
+            return;
+        }
         if (!errors.email && !errors.password) {
             try {
                 const response = await axios.post('http://localhost:3125/api/auth/signin', { form });
@@ -165,19 +174,21 @@ function Login() {
                                         console.log('Google Login Success:', response.data);
                                         setDialogContent({ title: 'Login Success', description: 'You have successfully logged into your account.' });
                                         setDialogOpen(true);
+                                        localStorage.setItem('token', response.data.token)
+                                        localStorage.setItem('userid', response.data.user._id)
                                         setTimeout(() => {
-                                            navigate('/form-builder');
+                                            navigate(`/clients/${response.data.user._id}`);
                                         }, 2000);
                                     })
                                     .catch((error) => {
-                                        console.error('Google Login Error:', error);
-                                        setDialogContent({ title: 'Login Error', description: 'There was an error logging into your account.' });
+                                        console.error('Error:', error);
+                                        setDialogContent({ title: 'Error', description: 'There was an error logging into your account.' });
                                         setDialogOpen(true);
                                     });
                             }}
                             onError={() => {
                                 console.log('Login Failed');
-                                setDialogContent({ title: 'Login Error', description: 'There was an error logging into your account.' });
+                                setDialogContent({ title: 'Error', description: 'There was an error logging into your account.' });
                                 setDialogOpen(true);
                             }}
                         />
@@ -185,13 +196,13 @@ function Login() {
                 </div>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="h-[200px]">
+                <DialogContent className="h-auto">
                     <DialogHeader>
-                        <DialogTitle className={`${dialogContent.title === 'Login Error' ? 'text-red-600' : 'text-blue-700'}`}>
+                        <DialogTitle className={`${dialogContent.title === 'Error' ? 'text-red-600' : 'text-blue-700'}`}>
                             <span className="text-4xl">{dialogContent.title}</span>
                         </DialogTitle>
                         <DialogDescription>
-                            <span className="mt-20 text-xl">{dialogContent.description}</span>
+                            <span className=" text-xl">{dialogContent.description}</span>
                         </DialogDescription>
                     </DialogHeader>
                 </DialogContent>

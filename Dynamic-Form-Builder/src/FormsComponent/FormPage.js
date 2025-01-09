@@ -97,6 +97,7 @@ const FormPage = () => {
         if (res.status === 200) {
           setForms(prevForms => [...prevForms, { formName }]);
           showAddForm(false)
+          navigate(`/form-builder/?clientId=${clientId}&formId=${res.data.data._id}`)
         }
       } catch (error) {
         console.error('Error in addForm:', error);
@@ -139,8 +140,8 @@ const FormPage = () => {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
-    localStorage.removeItem('formToken')
     navigate('/login')
+    window.location.reload()
   }
 
   const handlePageClick = (data) => {
@@ -264,9 +265,9 @@ const FormPage = () => {
         </ul>
         <ReactPaginate
           previousLabel={currentPage !== 0 ? <MoveLeft /> : null}
-          nextLabel={currentPage < Math.ceil(clients.length / clientsPerPage) - 1 ? <MoveRightIcon /> : null}
+          nextLabel={currentPage < Math.ceil(forms.length / clientsPerPage) - 1 ? <MoveRightIcon /> : null}
           breakLabel={"..."}
-          pageCount={Math.ceil(clients.length / clientsPerPage)}
+          pageCount={Math.ceil(forms.length / clientsPerPage)}
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
           onPageChange={handlePageClick}
@@ -286,9 +287,9 @@ const FormPage = () => {
                 </DialogTitle>
                 <DialogDescription>
                   <span className='mt-20 text-lg'>
-                    <div className='flex flex-row gap-2'>
+                    <div className='flex flex-col gap-2'>
                       <label>Enter Form Name</label>
-                      <input onChange={handleChange} className='border border-black h-[35px]' />
+                      <input onChange={handleChange} className='border border-black h-[40px] rounded-sm p-2' />
                     </div>
                     <button onClick={handleAddForm} className='border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[140px] rounded-lg text-white'>Add New Form</button>
                   </span>

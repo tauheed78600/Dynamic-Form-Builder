@@ -253,7 +253,7 @@ const validatePassword = (password) => {
             />
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogContent className="h-[200px]">
+            <DialogContent className="h-auto">
               <DialogHeader>
                 <DialogTitle
                   className={`${
@@ -265,7 +265,7 @@ const validatePassword = (password) => {
                   <p className="text-4xl">{dialogContent.title}</p>
                 </DialogTitle>
                 <DialogDescription>
-                  <p className="mt-20 text-xl">{dialogContent.description}</p>
+                  <p className="mt- text-xl">{dialogContent.description}</p>
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>

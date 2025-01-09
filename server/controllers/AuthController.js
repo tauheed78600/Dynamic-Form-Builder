@@ -55,17 +55,25 @@ export const addFormData = async (req, res, next) => {
 export const saveFormData = async (req, res, next) => {
     try {
         const { id } = req.params;
-        console.log("inside saveFormData", req.body, id);
+        console.log("inside saveFormData", req.body);
 
-        const updatedDocument = await FormData.findOneAndUpdate(
-            { _id: id },
-            { $set: req.body },
-            { new: true, upsert: true, strict: false }
-        );
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: 'formId is required',
+            });
+        }
+
+        const newDocument = new FormData({
+            formId: id,
+            ...req.body,
+        });
+
+        const savedDocument = await newDocument.save();
 
         return res.status(200).json({
-            message: 'Form Details SuccessFully Saved',
-            data: updatedDocument,
+            message: 'Form Details Successfully Saved',
+            data: savedDocument,
         });
     } catch (error) {
         console.error('Error in saveFormData:', error);
@@ -79,9 +87,19 @@ export const saveFormData = async (req, res, next) => {
 export const getFormDetails = async (req, res, next) => {
     try{
         const { id } = req.params
-        
+        console.log("inside getFormDetails", id)
+        const res1 = await FormData.find({formId:id})
+        console.log("res line 92", res1)
+        return res.status(200).json({
+            message: "Form Details Fetched",
+            data: res1
+        })
     }catch(error){
-
+        console.error('Error in getFormDetails:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+        });
     }
 }
 
@@ -290,7 +308,7 @@ export const addForms = async (req, res, next) => {
         console.log("inside add form API", id, formName)
         const form = new Form({ formName: formName, clientId: id })
         await form.save()
-        res.status(200).json({ message: "New Form Created" })
+        res.status(200).json({ message: "New Form Created", data: form })
     } catch (error) {
         console.log("error in adding form", error)
         return res.status(500).json({ message: "Error Adding Form", error: error.message });
@@ -304,7 +322,7 @@ export const addClient = async (req, res, next) => {
         console.log("inside add API", id, clientName)
         const client = new Client({ clientName: clientName, user_id: id })
         await client.save();
-        return res.status(200).json({ message: "Client Added Successfully" })
+        return res.status(200).json({ message: "Client Added Successfully", data:client })
     } catch (error) {
         return res.status(500).json({ message: "Error Adding clients", error: error.message });
     }

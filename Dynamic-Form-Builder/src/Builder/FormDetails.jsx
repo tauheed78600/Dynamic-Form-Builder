@@ -27,7 +27,7 @@ function FormDetails({ userid }) {
       ) : (
         formDetails.map((form, idx) => (
           <div key={idx} className="border p-4 mb-4 rounded-lg shadow-xl">
-            <h3 className="font-bold text-lg mb-2">Form {idx + 1}</h3>
+            <h3 className="font-bold text-lg mb-2">Submission {idx + 1}</h3>
             <ul>
               {Object.entries(form).map(([key, value]) => (
                 <li key={key} className="text-sm text-gray-700">

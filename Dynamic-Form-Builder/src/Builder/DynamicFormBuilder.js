@@ -1,7 +1,7 @@
 import { FormBuilder } from "@tsed/react-formio";
 import { useState, useEffect } from "react";
 import "./DynamicFormBuilder.css";
-import { Check, Clipboard, Copy, Edit2, MenuIcon, X } from "lucide-react";
+import { Check, CheckCircle, CheckCircle2, Clipboard, Copy, Edit2, Loader, MenuIcon, Ticket, X } from "lucide-react";
 import { addFormData, getFormData, editForm } from "../APICalls/ClientAPIs";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -22,7 +22,8 @@ export default function DynamicFormBuilder() {
   const [error, showError] = useState(false)
   const [embed, showEmbed] = useState(false)
   const [copySuccess, setCopySuccess] = useState('');
-  const[drop, openDrop] = useState(false)
+  const [drop, openDrop] = useState(false)
+  const [saveForm, setSaveForm] = useState(false)
 
   const location = useLocation();
   const navigate = useNavigate()
@@ -93,20 +94,24 @@ export default function DynamicFormBuilder() {
   }
 
   async function saveFormLayout() {
+    setSaveForm(true)
     console.log("RequestData in line 54", formLayout)
     try {
       const response = await addFormData(formId, formLayout)
       console.log("respone line 57", response)
       if (response.status !== 200) {
-        showError(true)
+        // showError(true)
+        setSaveForm(false)
       }
       else {
-        showSuccess(true)
+        // showSuccess(true)
         console.log("Form saved successfully!");
+        setSaveForm(false)
       }
     } catch (error) {
-      showError(true)
+      // showError(true)
       console.error("Error saving form layout:", error);
+      setSaveForm(false)
     }
   }
 
@@ -134,20 +139,21 @@ export default function DynamicFormBuilder() {
       <div id="form-header">
         <div id="form-title">
           <div>
-          <span className="font-extrabold text-2xl" style={{ display: edit ? "none" : "block" }}>{formName}</span>
-          <span style={{ display: edit ? "block" : "none" }}>
-            <input
-              type="text"
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-            />
-          </span>
+            <span className="font-extrabold text-2xl" style={{ display: edit ? "none" : "block" }}>{formName}</span>
+            <span style={{ display: edit ? "block" : "none" }}>
+              <input
+                type="text"
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                className="w-[60%] border border-black"
+              />
+            </span>
           </div>
           <div
             className="form-title-img"
             style={{ display: edit ? "block" : "none" }}
           >
-            <img src="/close.png" alt="Close" onClick={changeEdit} />
+            <Check onClick={changeEdit} />
           </div>
           <div
             className="form-title-img"
@@ -157,27 +163,55 @@ export default function DynamicFormBuilder() {
           </div>
         </div>
         {/* <div></div> */}
-        <div className="flex items-center buttonDiv">
-          <button onClick={handleSubmittedForm} className="bg-blue h-10 w-48 mr-2 bg-blue-600 text-white rounded-xl">
+        <div className="flex items-center buttonDiv ">
+          <button
+            onClick={handleSubmittedForm}
+            className="bg-blue h-10 w-48 mr-2 bg-blue-600 text-white rounded-xl"
+          >
             See Submitted Forms
           </button>
-          <button onClick={() => showEmbed(true)} className="bg-blue h-10 w-36 bg-blue-600 text-white rounded-xl">
+          <button
+            onClick={() => showEmbed(true)}
+            className="bg-blue h-10 w-36 bg-blue-600 text-white rounded-xl"
+          >
             Embed Code
           </button>
           <button
             id="saveFormButton"
-            className="bg-blue h-10 w-[120px] mr-2 bg-blue-600 text-white rounded-xl ml-4"
+            className="bg-blue h-10 w-[120px] mr-2 bg-blue-600 text-white rounded-xl ml-4 flex items-center justify-center"
             onClick={saveFormLayout}
           >
-            Save Changes
+            {saveForm ? <Loader className="animate-spin" /> : 'Save Changes'}
           </button>
         </div>
-        <div className="flexj justify-end ml-24 menuButton relative">
-        <MenuIcon onClick={()=>openDrop(true)}/>
-          <div className="absolute">
 
-          </div>
+        <div className="flex justify-end ml-24 menuButton relative md:hidden">
+          <MenuIcon onClick={() => openDrop(!drop)} />
+          {drop && (
+            <div className="absolute top-10 right-0 bg-white shadow-lg rounded-md p-4 z-10">
+              <button
+                onClick={handleSubmittedForm}
+                className="block border w-full text-left mb-2 h-auto bg-blue px-4 text-black rounded-md"
+              >
+                See Submitted Forms
+              </button>
+              <button
+                onClick={() => showEmbed(true)}
+                className="block border w-full text-left mb-2 bg-blue h-auto px-4 text-black rounded-md"
+              >
+                Embed Code
+              </button>
+              <button
+                id="saveFormButton"
+                onClick={saveFormLayout}
+                className="block border w-full text-left bg-blue h-auto px-4 text-black rounded-md"
+              >
+                Save Changes
+              </button>
+            </div>
+          )}
         </div>
+
       </div>
       <div className="dynamic-form-builder">
         {loading ? (
@@ -195,28 +229,28 @@ export default function DynamicFormBuilder() {
 
         {embed && (
           <Dialog open={embed} onOpenChange={showEmbed}>
-            <DialogContent className="h-auto">
+            <DialogContent className="h-auto w-full flex justify-center">
               <DialogHeader>
-                <DialogTitle>
-                  <span className="text-2xl text-blue-600 font-extrabold">Embedded Code</span>
-                </DialogTitle>
+                <DialogTitle>Embedded Code</DialogTitle>
                 <DialogDescription>
-                  <div className="w-[450px]">
-                    <span className="mt-20 text-lg">
-                      <p>Paste this Embed Code into your website code</p>
-                    </span>
-                    <div className="relative">
-                      <div className="text-white font-mono bg-gray-700 h-auto w-[450px] p-4 overflow-auto break-words">
+                  Paste this Embed Code into your website code.
+                  <div className="lg:w-[450px] w-[100%] flex justify-center">
+                    <div className="text-white relative font-mono bg-gray-700 h-auto lg:w-[450px] w-[60%] p-2 overflow-auto break-words">
+                      <div className="flex justify-between mb-2">
+                        <div className="flex flex-row gap-2">
+                          <div className="h-3 w-3  bg-red-500 rounded-full"></div>
+                          <div className="h-3 w-3  bg-green-500 rounded-full"></div>
+                          <div className="h-3 w-3  bg-blue-500 rounded-full"></div>
+                        </div>
                         <button
                           onClick={handleCopy}
                           className="absolute top-2 right-2 bg-transparent text-white rounded"
                         >
                           {!copied ? <Clipboard className="h-5" /> : <Check className="h-5" />}
                         </button>
-                        <span className="mt-1 block">{iframeCode}</span>
                       </div>
+                      <span className="mt-4 block">{iframeCode}</span>
                     </div>
-
                   </div>
                 </DialogDescription>
               </DialogHeader>

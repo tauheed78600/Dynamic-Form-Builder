@@ -36,23 +36,23 @@ function Register() {
   const [success, setSuccess] = useState(false);
 
   const validateEmail = (email) => {
-    if(email===''){
-        return 'Email cannot be empty'
+    if (email === '') {
+      return 'Email cannot be empty'
     }
     return validator.isEmail(email) ? '' : 'Invalid email address';
-};
+  };
 
-const validatePassword = (password) => {
-    if(password === ''){
-        return 'Password cannot be empty'
+  const validatePassword = (password) => {
+    if (password === '') {
+      return 'Password cannot be empty'
     }
     return validator.isStrongPassword(password)
-        ? ''
-        : 'Password must be at least 8 characters long, include uppercase, lowercase, number, and a special character.';
-};
+      ? ''
+      : 'Password must be at least 8 characters long, include uppercase, lowercase, number, and a special character.';
+  };
 
   const validateName = (name) => {
-    if (name === ''){
+    if (name === '') {
       return "Name must not be empty"
     }
     if (!validator.isAlpha(name)) {
@@ -60,6 +60,8 @@ const validatePassword = (password) => {
     }
     return "";
   };
+
+  
 
   const navigate = useNavigate();
 
@@ -90,39 +92,48 @@ const validatePassword = (password) => {
   };
 
   const handleSubmit = async () => {
-    if (form.name === "" || form.email === "" || form.password === "") {
-      console.log("inside fist condition");
-      setDialogContent({
-        title: "Error",
-        description: "Please fill all the fields",
-      });
-      setDialogOpen(true);
-      return;
-    }
-    try {
-      console.log("form in line25", form);
-      const response = await axios.post(
-        "http://localhost:3125/api/auth/signup",
-        { form }
-      );
-      setSuccess(true);
-      setDialogContent({
-        title: "Registration Success",
-        description: "You have successfully registered your account.",
-      });
-      setDialogOpen(true);
-      console.log("Response in line 25", response);
-      setForm({ name: "", email: "", password: "" });
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (error) {
-      console.error("Error:", error);
-      setDialogContent({
-        title: "Registration Error",
-        description: "There was an error registering your account.",
-      });
-      setDialogOpen(true);
+    setTouched({
+      name:true,
+      email: true,
+      password: true
+    });
+    
+    const nameError = validateName(form.name)
+    const emailError = validateEmail(form.email);
+    const passwordError = validatePassword(form.password);
+
+    setErrors({
+      name: nameError,
+      email: emailError,
+      password: passwordError
+    });
+
+    if (!nameError && !emailError && !passwordError ) {
+      try {
+        console.log("form in line25", form);
+        const response = await axios.post(
+          "http://localhost:3125/api/auth/signup",
+          { form }
+        );
+        setSuccess(true);
+        setDialogContent({
+          title: "Registration Success",
+          description: "You have successfully registered your account.",
+        });
+        setDialogOpen(true);
+        console.log("Response in line 25", response);
+        setForm({ name: "", email: "", password: "" });
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } catch (error) {
+        console.error("Error:", error);
+        setDialogContent({
+          title: "Registration Error",
+          description: "There was an error registering your account.",
+        });
+        setDialogOpen(true);
+      }
     }
   };
 
@@ -141,8 +152,7 @@ const validatePassword = (password) => {
   return (
     <div className="flex justify-center mt-10">
       <div
-        className="border-2 relative h-auto w-[30%]  rounded-3xl shadow-2xl bg-cover"
-        style={{ backgroundImage: "url('formBG.png')" }}
+        className="border-2 relative h-auto lg:w-[30%]  rounded-3xl shadow-2xl bg-cover bg-blue-600"
       >
         <div className="p-4 ml-2">
           <div className="font-extrabold text-5xl mt-4">
@@ -157,9 +167,8 @@ const validatePassword = (password) => {
               onBlur={handleBlur}
               name="name"
               value={form.name}
-              className={` rounded-full text-white h-14 w-[100%] pl-10 pr-12 border  bg-transparent ${
-                touched.name && errors.name ? "border-red-500" : ""
-              }`}
+              className={` rounded-full text-white h-14 w-[100%] pl-10 pr-12 border  bg-transparent ${touched.name && errors.name ? "border-red-500" : ""
+                }`}
             />
             {touched.name && errors.name && (
               <p className="text-red-500 ml-6 text-sm font-extrabold mt-2">
@@ -176,9 +185,8 @@ const validatePassword = (password) => {
               onBlur={handleBlur}
               name="email"
               value={form.email}
-              className={`border text-white  bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${
-                touched.email && errors.email ? "border-red-500" : ""
-              }`}
+              className={`border text-white  bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.email && errors.email ? "border-red-500" : ""
+                }`}
             />
             <Mail className="absolute right-6 mt-3 text-gray-200" />
             {touched.email && errors.email && (
@@ -197,9 +205,8 @@ const validatePassword = (password) => {
               onBlur={handleBlur}
               name="password"
               value={form.password}
-              className={`border text-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${
-                touched.password && errors.password ? "border-red-500" : ""
-              }`}
+              className={`border text-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.password && errors.password ? "border-red-500" : ""
+                }`}
             />
             <Lock className="absolute right-6 mt-3 text-gray-200" />
             {touched.password && errors.password && (
@@ -256,11 +263,10 @@ const validatePassword = (password) => {
             <DialogContent className="h-auto">
               <DialogHeader>
                 <DialogTitle
-                  className={`${
-                    dialogContent.title === "Error"
-                      ? "text-red-600"
-                      : "text-blue-700"
-                  }`}
+                  className={`${dialogContent.title === "Error"
+                    ? "text-red-600"
+                    : "text-blue-700"
+                    }`}
                 >
                   <p className="text-4xl">{dialogContent.title}</p>
                 </DialogTitle>

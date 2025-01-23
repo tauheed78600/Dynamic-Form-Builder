@@ -46,15 +46,17 @@ function Login() {
             : 'Password must be at least 8 characters long, include uppercase, lowercase, number, and a special character.';
     };
 
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prevForm) => ({
             ...prevForm,
             [name]: value
         }));
-        setErrors('');
+        // Clear errors when user starts typing
+        setErrors(prev => ({
+            ...prev,
+            [name]: ''
+        }));
     };
 
     const handleBlur = (e) => {
@@ -65,33 +67,31 @@ function Login() {
     };
 
     const handleSubmit = async () => {
-        if (form.name === "" || form.email === "" || form.password === "") {
-            console.log("inside fist condition");
-            setDialogContent({
-                title: "Error",
-                description: "Please fill all the fields",
-            });
-            setDialogOpen(true);
-            return;
-        }
-        if (!errors.email && !errors.password) {
+        setTouched({
+            email: true,
+            password: true
+        });
+
+        const emailError = validateEmail(form.email);
+        const passwordError = validatePassword(form.password);
+        
+        setErrors({
+            email: emailError,
+            password: passwordError
+        });
+
+        if (!emailError && !passwordError) {
             try {
                 const response = await axios.post('http://localhost:3125/api/auth/signin', { form });
-                setDialogContent({ title: 'Login Success', description: 'You have successfully logged into your account.' });
-                setDialogOpen(true);
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('userid', response.data.id)
-                console.log("response line 68", response.data)
-                setTimeout(() => {
-                    navigate(`/clients/${response.data.id}`);
-                }, 2000);
+                navigate(`/clients/${response.data.id}`);
+
             } catch (err) {
                 console.error('Error:', err);
-                setDialogContent({ title: 'Login Error', description: 'There was an error logging into your account.' });
+                setDialogContent({ title: 'Error', description: 'There was an error logging into your account.' });
                 setDialogOpen(true);
             }
-        } else {
-            console.error('Validation errors', errors);
         }
     };
 
@@ -102,8 +102,7 @@ function Login() {
     return (
         <div className="flex justify-center mt-10">
             <div
-                className="border-2 relative h-auto w-[30%]  rounded-3xl shadow-2xl bg-cover"
-                style={{ backgroundImage: "url('formBG.png')" }}
+                className="border-2 relative h-auto lg:w-[30%]  rounded-3xl shadow-2xl bg-cover bg-blue-600"
             >
                 <div className="p-4 ml-2">
                     <div className="font-extrabold text-5xl mt-4">
@@ -118,8 +117,7 @@ function Login() {
                             autoComplete="off"
                             name="email"
                             value={form.email}
-                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.email && errors.email ? 'border-red-500' : ''
-                                }`}
+                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${(touched.email && errors.email) ? 'border-red-500' : ''}`}
                         />
                         <Mail className="absolute right-6 mt-3 text-gray-200" />
                         {touched.email && errors.email && (
@@ -135,8 +133,7 @@ function Login() {
                             onBlur={handleBlur}
                             name="password"
                             value={form.password}
-                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${touched.password && errors.password ? 'border-red-500' : ''
-                                }`}
+                            className={`border text-white border-white bg-transparent rounded-full h-14 w-[100%] pl-10 pr-12 ${(touched.password && errors.password) ? 'border-red-500' : ''}`}
                         />
                         <Lock className="absolute right-6 mt-3 text-gray-200" />
                         {touched.password && errors.password && (

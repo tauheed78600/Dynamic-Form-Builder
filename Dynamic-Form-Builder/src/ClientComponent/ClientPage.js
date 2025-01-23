@@ -90,12 +90,13 @@ const ClientList = () => {
     }
   };
 
-  const handleDeleteClient = async () => {
+  const handleDeleteClient = async (id) => {
+    // setClientToDelete(id);s
     try {
-      const res = await deleteClient12(clientToDelete);
+      const res = await deleteClient12(id);
       console.log("Delete response1234:", res);
       if (res.status === 200) {
-        setClients((prevClients) => prevClients.filter((client) => client._id !== clientToDelete));
+        setClients((prevClients) => prevClients.filter((client) => client._id !== id));
         showDeleteModal(false);
         setClientToDelete(null);
       }
@@ -111,17 +112,11 @@ const ClientList = () => {
   const displayedClients = clients.slice(currentPage * clientsPerPage, (currentPage + 1) * clientsPerPage);
 
 
-  const confirmDeleteClient = (id) => {
-    setClientToDelete(id);
-    showDeleteModal(true);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
     window.location.reload()
     navigate('/login')
-    
   }
 
   return (
@@ -131,7 +126,7 @@ const ClientList = () => {
           <MenuIcon className='h-10 w-10' onClick={() => showSidebar(true)} />
         </div>
         <div
-          className={`fixed h-full bg-white left-0 top-0 w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
+          className={`fixed h-full bg-white left-0 top-0 lg:w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
             } transition-transform duration-500 ease-in-out z-10 overflow-y-auto scrollbar-hidden`}
         >
           <div className="flex justify-between items-center p-4 border-b border-gray-300">
@@ -146,7 +141,7 @@ const ClientList = () => {
           </div>
           <div className="p-4">
             {clients.map((client, index) => (
-              <li key={index} className="client-item">
+              <li key={index} className="client-item-side">
                 <div
                   onClick={() => handleClientClick(client._id)}
                   className="client-item-content"
@@ -160,14 +155,15 @@ const ClientList = () => {
             ))}
           </div>
         </div>
+
         <div>
-          <h1 className='text-center text-6xl text-blue-600'>Dynamic Form Builder</h1>
-        </div>
-        <div>
-          <button onClick={() => showLogout(true)} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
+          <button onClick={handleLogout} className='bg-red-600 text-white lg:text-xl text-sm lg:rounded-xl lg:h-12 lg:w-24 w-20 h-12'>Logout</button>
         </div>
       </div>
       <div className=''>
+        <div>
+          <h1 className='text-center lg:text-6xl text-2xl text-blue-600'>Dynamic Form Builder</h1>
+        </div>
         <h1 className='text-center'>Clients</h1>
       </div>
       <hr className='mt-5' />
@@ -191,7 +187,7 @@ const ClientList = () => {
                     <input
                       value={editedClientName}
                       onChange={handleEditChange}
-                      className="border border-black"
+                      className="border border-black lg:w-auto w-[110px]"
                     />
                     <button
                       onClick={() => saveEditedClient(client._id)}
@@ -201,7 +197,7 @@ const ClientList = () => {
                     </button>
                     <button
                       onClick={() => setEditIndex(null)}
-                      className="border bg-red-600 rounded-lg h-10 w-24 text-white"
+                      className="border bg-red-600 rounded-lg h-10 w-20 text-white"
                     >
                       Cancel
                     </button>
@@ -210,27 +206,31 @@ const ClientList = () => {
                   <span>{client.clientName}</span>
                 )}
               </div>
-              <div className="client-item-actions">
-                <button
-                  onClick={() => {
-                    setEditIndex(index);
-                    setEditedClientName(client.clientName);
-                  }}
-                  className="icon-button"
-                  aria-label="Edit client"
-                >
-                  <Edit />
-                </button>
-                <button
-                  onClick={() => confirmDeleteClient(client._id)}
-                  className="icon-button"
-                  aria-label="Delete client"
-                >
-                  <Trash />
-                </button>
-              </div>
+
+              {editIndex !== index && (
+                <div className="client-item-actions">
+                  <button
+                    onClick={() => {
+                      setEditIndex(index);
+                      setEditedClientName(client.clientName);
+                    }}
+                    className="icon-button"
+                    aria-label="Edit client"
+                  >
+                    <Edit />
+                  </button>
+                  <button
+                    onClick={()=>handleDeleteClient(client._id)}
+                    className="icon-button"
+                    aria-label="Delete client"
+                  >
+                    <Trash />
+                  </button>
+                </div>
+              )}
             </li>
           ))}
+
         </ul>
 
         <ReactPaginate
@@ -260,12 +260,13 @@ const ClientList = () => {
                     <label className=''>Enter Client Name</label>
                     <input
                       onChange={handleChange}
-                      className="border border-black h-[40px] rounded-sm p-2 text-sm"
+                      className="border border-black h-[40px] rounded-full p-4 text-sm"
+                      placeholder='Ex: Microsoft'
                     ></input>
                   </div>
                   <button
                     onClick={handleAddClient}
-                    className="border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[140px] rounded-lg text-white"
+                    className="border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[440px] rounded-full text-white"
                   >
                     Add Client
                   </button>

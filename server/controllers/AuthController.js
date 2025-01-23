@@ -64,12 +64,12 @@ export const saveFormData = async (req, res, next) => {
             });
         }
 
-        const newDocument = new FormData({
+        const document = new FormData({
             formId: id,
             ...req.body,
         });
 
-        const savedDocument = await newDocument.save();
+        const savedDocument = await document.save();
 
         return res.status(200).json({
             message: 'Form Details Successfully Saved',

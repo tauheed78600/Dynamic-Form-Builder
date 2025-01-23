@@ -140,8 +140,7 @@ const FormPage = () => {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
-    navigate('/login')
-    window.location.reload()
+    window.location.href = '/login'
   }
 
   const handlePageClick = (data) => {
@@ -158,8 +157,8 @@ const FormPage = () => {
           <MenuIcon className='h-10 w-10' onClick={() => showSidebar(true)} />
         </div>
         <div
-          className={`fixed h-full bg-white left-0 top-0 w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
-           } transition-transform duration-500 ease-in-out z-10 overflow-y-auto scoll-smooth scrollbar-hidden`} 
+          className={`fixed h-full bg-white left-0 top-0 lg:w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
+            } transition-transform duration-500 ease-in-out z-10 overflow-y-auto scoll-smooth scrollbar-hidden`}
         >
           <div className="flex justify-between items-center p-4 border-b border-gray-300">
             <div>
@@ -173,7 +172,7 @@ const FormPage = () => {
           </div>
           <div className="p-4">
             {clients.map((client, index) => (
-              <li key={index} className="client-item">
+              <li key={index} className="client-item-side">
                 <div
                   onClick={() => handleClientClick(client._id)}
                   className="client-item-content"
@@ -188,13 +187,15 @@ const FormPage = () => {
           </div>
         </div>
         <div>
-          <h1 className='text-center text-6xl text-blue-600'>Dynamic Form Builder</h1>
+          <button onClick={handleLogout} className='bg-red-600 text-white lg:text-xl text-sm lg:rounded-xl lg:h-12 lg:w-24 w-20 h-12'>Logout</button>
+
         </div>
-        <div>
-          <button onClick={() =>showLogout(true)} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
-        </div>
+
       </div>
       <div className=''>
+        <div>
+          <h1 className='text-center lg:text-6xl text-2xl text-blue-600'>Dynamic Form Builder</h1>
+        </div>
         <h1 className='text-center'>Forms</h1>
       </div>
       <hr className='mt-5' />
@@ -217,7 +218,7 @@ const FormPage = () => {
                     <input
                       value={editedFormName}
                       onChange={handleEditChange}
-                      className="border border-black"
+                      className="border border-black lg:w-auto w-[110px]"
                     />
                     <button
                       onClick={() => saveEditedForm(form._id)}
@@ -233,33 +234,36 @@ const FormPage = () => {
                     </button>
                   </div>
                 ) : (
-
                   <div onClick={() => navigate(`/form-builder/?clientId=${form.clientId}&formId=${form._id}`)}>
                     <span>{form.formName}</span>
                   </div>
                 )}
               </div>
-              <div className="form-item-actions">
-                <button
-                  onClick={() => {
-                    setEditIndex(index);
-                    setEditedFormName(form.formName);
-                  }}
-                  className="icon-button"
-                  aria-label="Edit form"
-                >
-                  <Edit />
-                </button>
-                <button
-                  onClick={() => confirmDeleteForm(form._id)}
-                  className="icon-button"
-                  aria-label="Delete form"
-                >
-                  <Trash2 />
-                </button>
-              </div>
+
+              {editIndex !== index && (
+                <div className="form-item-actions">
+                  <button
+                    onClick={() => {
+                      setEditIndex(index);
+                      setEditedFormName(form.formName);
+                    }}
+                    className="icon-button"
+                    aria-label="Edit form"
+                  >
+                    <Edit />
+                  </button>
+                  <button
+                    onClick={() => confirmDeleteForm(form._id)}
+                    className="icon-button"
+                    aria-label="Delete form"
+                  >
+                    <Trash2 />
+                  </button>
+                </div>
+              )}
             </li>
           ))}
+
 
 
         </ul>
@@ -289,9 +293,12 @@ const FormPage = () => {
                   <span className='mt-20 text-lg'>
                     <div className='flex flex-col gap-2'>
                       <label>Enter Form Name</label>
-                      <input onChange={handleChange} className='border border-black h-[40px] rounded-sm p-2' />
+                      <input onChange={handleChange} 
+                      className='border border-black h-[40px] rounded-full p-4 text-sm' 
+                      placeholder='Ex: Google'
+                      />
                     </div>
-                    <button onClick={handleAddForm} className='border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[140px] rounded-lg text-white'>Add New Form</button>
+                    <button onClick={handleAddForm} className='border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[440px] rounded-full text-white'>Add New Form</button>
                   </span>
                 </DialogDescription>
               </DialogHeader>
@@ -300,7 +307,7 @@ const FormPage = () => {
         </>
       )}
 
-{logout && <>
+      {logout && <>
         <Dialog open={logout} onOpenChange={showLogout}>
           <DialogContent className="h-auto">
             <DialogHeader>

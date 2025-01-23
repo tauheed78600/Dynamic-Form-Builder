@@ -7,6 +7,7 @@ import Register from "./AuthComponent/Register";
 import ClientList from "./ClientComponent/ClientPage";
 import FormPage from "./FormsComponent/FormPage";
 import FormDetails from "./Builder/FormDetails";
+import Home from "./Home/home";
 
 const ProtectedRoute = ({ element }) => {
   const token = localStorage.getItem("token");
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute element={<FormPage />} />
     ),
+  },
+  {
+    path: '/',
+    element: <Home/>
   },
   {
     path: "/login",

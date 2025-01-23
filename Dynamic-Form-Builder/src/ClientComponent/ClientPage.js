@@ -9,8 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog.tsx';
-import { Edit, MenuIcon, Trash } from 'lucide-react';
+import { Edit, MenuIcon, Move, MoveLeft, MoveLeftIcon, MoveRight, MoveRightIcon, Trash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
 
 const ClientList = () => {
   const [clients, setClients] = useState([]);
@@ -21,6 +22,9 @@ const ClientList = () => {
   const [deleteClientModal, showDeleteModal] = useState(false);
   const [clientToDelete, setClientToDelete] = useState(null);
   const [sidebar, showSidebar] = useState(false)
+  const [logout, showLogout] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0);
+  const clientsPerPage = 5;
 
   const params = useParams();
   const navigate = useNavigate();
@@ -98,12 +102,19 @@ const ClientList = () => {
     }
   };
 
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+  };
+
+  const displayedClients = clients.slice(currentPage * clientsPerPage, (currentPage + 1) * clientsPerPage);
+
+
   const confirmDeleteClient = (id) => {
     setClientToDelete(id);
     showDeleteModal(true);
   };
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
     localStorage.removeItem('formToken')
@@ -131,7 +142,7 @@ const ClientList = () => {
             >X</span>
           </div>
           <div className="p-4">
-            {clients.map((client, index) => (
+            {displayedClients.map((client, index) => (
               <li key={index} className="client-item">
                 <div
                   onClick={() => handleClientClick(client._id)}
@@ -139,8 +150,8 @@ const ClientList = () => {
                   style={{ cursor: editIndex === index ? 'not-allowed' : 'pointer' }}
                 >
                   <span className="bullet">•</span>
-                  
-                    <span>{client.clientName}</span>
+
+                  <span>{client.clientName}</span>
                 </div>
               </li>
             ))}
@@ -150,21 +161,21 @@ const ClientList = () => {
           <h1 className='text-center text-6xl text-blue-600'>Dynamic Form Builder</h1>
         </div>
         <div>
-          <button onClick={handleLogout} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
+          <button onClick={() => showLogout(true)} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
         </div>
       </div>
       <div className=''>
         <h1 className='text-center'>Clients</h1>
       </div>
-      <hr className='mt-4' />
-      <main>
+      <hr className='mt-5' />
+      <main className='main-content'>
         <ul className="client-list">
           <div className='flex justify-end'>
             <button onClick={() => showAddClient(true)} className="new-client-button">
               + New Client
             </button>
           </div>
-          {clients.map((client, index) => (
+          {displayedClients.map((client, index) => (
             <li key={index} className="client-item">
               <div
                 onClick={() => handleClientClick(client._id)}
@@ -218,10 +229,24 @@ const ClientList = () => {
             </li>
           ))}
         </ul>
+
+        <ReactPaginate
+          previousLabel={currentPage !== 0 ? <MoveLeft /> : null}
+          nextLabel={currentPage < Math.ceil(clients.length / clientsPerPage) - 1 ? <MoveRightIcon /> : null}
+          breakLabel={"..."}
+          pageCount={Math.ceil(clients.length / clientsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+          className='flex justify-center gap-4'
+        />
+
       </main>
       {addClient && (
         <Dialog open={addClient} onOpenChange={showAddClient}>
-          <DialogContent className="h-[200px]">
+          <DialogContent className="h-auto">
             <DialogHeader>
               <DialogTitle>
                 <span className="text-xl">Add New Client</span>
@@ -248,9 +273,37 @@ const ClientList = () => {
         </Dialog>
       )}
 
+      {logout && <>
+        <Dialog open={logout} onOpenChange={showLogout}>
+          <DialogContent className="h-auto">
+            <DialogHeader>
+              <DialogTitle>
+                <span className="text-xl">Are you sure you want to Logout</span>
+              </DialogTitle>
+              <DialogDescription>
+                <div className="text-white flex flex-row gap-4 mt-9 justify-center">
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 h-10 w-24"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => showLogout(false)}
+                    className="bg-blue-600 h-10 w-24"
+                  >
+                    No
+                  </button>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </>}
+
       {deleteClientModal && (
         <Dialog open={deleteClientModal} onOpenChange={showDeleteModal}>
-          <DialogContent className="h-[200px]">
+          <DialogContent className="h-auto">
             <DialogHeader>
               <DialogTitle>
                 <span className="text-xl">Are you sure you want to delete this client?</span>

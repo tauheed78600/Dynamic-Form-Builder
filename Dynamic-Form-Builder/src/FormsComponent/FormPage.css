@@ -109,6 +109,17 @@
     cursor: pointer;
   }
   
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+
   /* Bullet point styling */
   .bullet {
     margin-right: 1rem;

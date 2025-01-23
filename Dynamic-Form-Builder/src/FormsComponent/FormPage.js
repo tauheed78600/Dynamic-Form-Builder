@@ -9,30 +9,61 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog.tsx';
-import { Edit, Menu, MenuIcon, Trash2 } from 'lucide-react';
+import { Edit, Menu, MenuIcon, Trash2, MoveLeft, MoveRightIcon } from 'lucide-react';
 import { addForms } from '../APICalls/FormAPIs';
 import { deleteForm } from '../APICalls/ClientAPIs';
 import { editForm } from '../APICalls/ClientAPIs';
-import { useNavigate } from 'react-router-dom';
 import { fetchClients } from '../APICalls/ClientAPIs';
+import ReactPaginate from 'react-paginate';
 
 const FormPage = () => {
-  const [client, setClient] = useSearchParams();
-  const clientName = client.get('client');
+  const [clients, setClients] = useState([]);
+  // const clientName = client.get('client');
   const [forms, setForms] = useState([])
   const [addForm, showAddForm] = useState(false)
   const [formName, setFormName] = useState('')
+  const [deleteFormModal, showDeleteModal] = useState(false);
+  const [formToDelete, setFormToDelete] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editedFormName, setEditedFormName] = useState('');
+  const [sidebar, showSidebar] = useState(false)
+  const [logout, showLogout] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0);
+  const clientsPerPage = 5;
 
-  const params = useParams()
-  console.log("params in line 11 forms", params.id)
+  const { clientId, formId } = useParams()
 
-  useEffect(()=>{
-    const fetchForms = async() =>{
-      try{
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchClients(clientId);
+        console.log('Response of fetchData:', response.data);
+        setClients(response.data);
+      } catch (error) {
+        console.error('Error in fetchData:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleClientClick = (formId) => {
+    if (editIndex === null) {
+      navigate(`/clients/${clientId}/forms/${formId}`);
+      showSidebar(false)
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
         const res = await fetchFormData(formId)
         console.log("response line 18 forms", res.data)
         setForms(res.data)
-      }catch(error){
+      } catch (error) {
         console.error('Error in fetchForms:', error);
       }
     }
@@ -57,7 +88,7 @@ const FormPage = () => {
     }
   };
 
-  const handleAddForm = () =>{
+  const handleAddForm = () => {
     const addForm = async () => {
       console.log("inside add form line 89", clientId)
       try {
@@ -105,12 +136,19 @@ const FormPage = () => {
     // }
   };
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
     localStorage.removeItem('formToken')
     navigate('/login')
   }
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+  };
+
+  const displayedClients = forms.slice(currentPage * clientsPerPage, (currentPage + 1) * clientsPerPage);
+
 
   return (
     <div className="container">
@@ -120,7 +158,7 @@ const FormPage = () => {
         </div>
         <div
           className={`fixed h-full bg-white left-0 top-0 w-[25%] border border-gray-600 shadow-2xl transform ${sidebar ? "translate-x-0" : "-translate-x-full"
-            } transition-transform duration-500 ease-in-out z-10`}
+           } transition-transform duration-500 ease-in-out z-10 overflow-y-auto scoll-smooth scrollbar-hidden`} 
         >
           <div className="flex justify-between items-center p-4 border-b border-gray-300">
             <div>
@@ -141,8 +179,8 @@ const FormPage = () => {
                   style={{ cursor: editIndex === index ? 'not-allowed' : 'pointer' }}
                 >
                   <span className="bullet">•</span>
-                  
-                    <span>{client.clientName}</span>
+
+                  <span>{client.clientName}</span>
                 </div>
               </li>
             ))}
@@ -150,23 +188,28 @@ const FormPage = () => {
         </div>
         <div>
           <h1 className='text-center text-6xl text-blue-600'>Dynamic Form Builder</h1>
-          
         </div>
         <div>
-          <button onClick={handleLogout} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
+          <button onClick={() =>showLogout(true)} className='bg-red-600 text-white text-xl rounded-xl h-12 w-24'>Logout</button>
         </div>
       </div>
       <div className=''>
         <h1 className='text-center'>Forms</h1>
       </div>
-      <hr className='mt-5'/>
+      <hr className='mt-5' />
       <main className="main-content">
         <ul className="form-list">
-          {forms.map((form, index) => (
-            <li key={index} className="form-item" onClick={()=>{
-              navigate(`/form-builder/?clientId=${params.id}&formId=${form._id}`);
-            }}>
-              <div className="form-item-content">
+          <div className='flex justify-end'>
+            <button onClick={() => showAddForm(true)} className="new-client-button">
+              + New Form
+            </button>
+          </div>
+          {displayedClients.map((form, index) => (
+            <li key={index} className="form-item">
+              <div
+                className="form-item-content mt-6"
+                style={{ cursor: editIndex === index ? 'not-allowed' : 'pointer' }}
+              >
                 <span className="bullet">•</span>
                 {editIndex === index ? (
                   <div className="flex flex-row gap-2">
@@ -189,47 +232,95 @@ const FormPage = () => {
                     </button>
                   </div>
                 ) : (
-                  <span>{form.formName}</span>
+
+                  <div onClick={() => navigate(`/form-builder/?clientId=${form.clientId}&formId=${form._id}`)}>
+                    <span>{form.formName}</span>
+                  </div>
                 )}
               </div>
               <div className="form-item-actions">
-              <button
+                <button
                   onClick={() => {
                     setEditIndex(index);
                     setEditedFormName(form.formName);
                   }}
                   className="icon-button"
-                  aria-label="Edit client"
+                  aria-label="Edit form"
                 >
                   <Edit />
                 </button>
                 <button
                   onClick={() => confirmDeleteForm(form._id)}
                   className="icon-button"
-                  aria-label="Delete client"
+                  aria-label="Delete form"
                 >
                   <Trash2 />
                 </button>
               </div>
             </li>
           ))}
+
+
         </ul>
+        <ReactPaginate
+          previousLabel={currentPage !== 0 ? <MoveLeft /> : null}
+          nextLabel={currentPage < Math.ceil(clients.length / clientsPerPage) - 1 ? <MoveRightIcon /> : null}
+          breakLabel={"..."}
+          pageCount={Math.ceil(clients.length / clientsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+          className='flex justify-center gap-4'
+        />
       </main>
-      {addForm && <>
-        <Dialog open={addForm} onOpenChange={showAddForm}>
-          <DialogContent className="h-[200px]">
+
+      {addForm && (
+        <>
+          <Dialog open={addForm} onOpenChange={showAddForm}>
+            <DialogContent className="h-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  <span className="text-xl">Add New Form</span>
+                </DialogTitle>
+                <DialogDescription>
+                  <span className='mt-20 text-lg'>
+                    <div className='flex flex-row gap-2'>
+                      <label>Enter Form Name</label>
+                      <input onChange={handleChange} className='border border-black h-[35px]' />
+                    </div>
+                    <button onClick={handleAddForm} className='border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[140px] rounded-lg text-white'>Add New Form</button>
+                  </span>
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+
+{logout && <>
+        <Dialog open={logout} onOpenChange={showLogout}>
+          <DialogContent className="h-auto">
             <DialogHeader>
               <DialogTitle>
-                <span className="text-xl">Add New Form</span>
+                <span className="text-xl">Are you sure you want to Logout</span>
               </DialogTitle>
               <DialogDescription>
-                <span className="mt-20 text-lg">
-                  <div className='flex flex-row gap-2'>
-                    <label>Enter Form Name</label>
-                    <input onChange={handleChange} className='border border-black h-[35px]'></input>
-                  </div>
-                  <button onClick={handleAddForm} className='border border-blue-400 bg-blue-400 mt-4 h-[50px] w-[140px] rounded-lg text-white'>Add New Form</button>
-                </span>
+                <div className="text-white flex flex-row gap-4 mt-9 justify-center">
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 h-10 w-24"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => showLogout(false)}
+                    className="bg-blue-600 h-10 w-24"
+                  >
+                    No
+                  </button>
+                </div>
               </DialogDescription>
             </DialogHeader>
           </DialogContent>
@@ -238,12 +329,12 @@ const FormPage = () => {
 
       {deleteFormModal && (
         <Dialog open={deleteFormModal} onOpenChange={showDeleteModal}>
-          <DialogContent className="h-[200px]">
+          <DialogContent className="h-auto">
             <DialogHeader>
               <DialogTitle>
                 <div className='flex flex-col'>
-                <span className="text-xl">Are you sure you want to delete this Form?</span>
-                <span className='text-gray-500 text-sm'>This will delete all the data related to the form</span>
+                  <span className="text-xl">Are you sure you want to delete this Form?</span>
+                  <span className='text-gray-500 text-sm'>This will delete all the data related to the form</span>
                 </div>
               </DialogTitle>
               <DialogDescription>
